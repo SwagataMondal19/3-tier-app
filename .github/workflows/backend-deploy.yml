@@ -1,0 +1,49 @@
+name: Deploy Backend to EKS
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - 'backend/**'
+      - 'k8s/dev/backend/**'
+      - '.github/workflows/backend-deploy.yml'
+
+env:
+  AWS_REGION: ap-south-1
+  ECR_REPOSITORY: expense-backend
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ap-south-1
+
+    - name: expense-backend
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Set Image URI
+      run: |
+        echo "IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${GITHUB_SHA}" >> $GITHUB_ENV
+
+    - name: Build Docker Image
+      run: |
+        docker build -t $IMAGE_URI ./backend
+
+    - name: Push Docker Image
+      run: |
+        docker push $IMAGE_URI
