@@ -1,0 +1,19 @@
+variable "region" {
+  default = "ap-south-1"
+}
+
+variable "cluster_name" {
+  default = "three-tier-eks"
+}
+
+variable "cluster_version" {
+  default = "1.31"
+}
+
+variable "vpc_name" {
+  default = "three-tier-vpc"
+}
+
+variable "vpc_cidr" {
+  default = "10.20.0.0/16"
+}
