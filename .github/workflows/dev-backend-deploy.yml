@@ -11,6 +11,7 @@ on:
 env:
   AWS_REGION: ap-south-1
   ECR_REPOSITORY: expense-backend
+  EKS_CLUSTER_NAME: 3-tier-eks
 
 jobs:
   deploy:
@@ -29,9 +30,9 @@ jobs:
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ap-south-1
+        aws-region: ${{ env.AWS_REGION }}
 
-    - name: expense-backend
+    - name: Login to ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
 
@@ -46,3 +47,30 @@ jobs:
     - name: Push Docker Image
       run: |
         docker push $IMAGE_URI
+
+    - name: Update Deployment Manifest
+      run: |
+        sed -i "s|IMAGE_PLACEHOLDER|$IMAGE_URI|g" k8s/dev/backend/deployment.yml
+
+    - name: Update kubeconfig
+      run: |
+        aws eks update-kubeconfig \
+          --name $EKS_CLUSTER_NAME \
+          --region $AWS_REGION
+
+    - name: Verify EKS Access
+      run: |
+        kubectl get nodes
+
+    - name: Deploy Backend
+      run: |
+        kubectl apply -f k8s/dev/backend/
+
+    - name: Restart Deployment
+      run: |
+        kubectl rollout restart deployment/expense-backend -n dev
+
+    - name: Verify Deployment
+      run: |
+        kubectl get pods -n dev
+        kubectl get svc -n dev

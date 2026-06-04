@@ -37,7 +37,7 @@ app.delete("/expenses/:id", (req, res) => {
 });
 
 app.get("/health", (req, res) => {
-  res.send("Backend healthy");
+  res.send("Backend healthy on dev");
 });
 
 const PORT = 3000;
