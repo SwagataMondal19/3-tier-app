@@ -11,7 +11,7 @@ variable "cluster_version" {
 }
 
 variable "vpc_name" {
-  default = "three-tier-vpc"
+  default = "3-tier-vpc"
 }
 
 variable "vpc_cidr" {
