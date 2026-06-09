@@ -1,0 +1,77 @@
+root@ip-172-31-16-196:/3-tier-app/.github/workflows# cat dev-backend-deploy.yml
+name: Deploy Frontend to EKS
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - 'frontend/**'
+      - 'k8s/dev/frontend/**'
+
+env:
+  AWS_REGION: ap-south-1
+  ECR_REPOSITORY: expense-frontend
+  EKS_CLUSTER_NAME: 3-tier-eks-cluster
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: Set Image URI
+      run: |
+        echo "IMAGE_URI=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${GITHUB_SHA}" >> $GITHUB_ENV
+
+    - name: Build Docker Image
+      run: |
+        docker build -t $IMAGE_URI ./backend
+
+    - name: Push Docker Image
+      run: |
+        docker push $IMAGE_URI
+
+    - name: Update Deployment Manifest
+      run: |
+        sed -i "s|IMAGE_PLACEHOLDER|$IMAGE_URI|g" k8s/dev/frontend/deployment.yml
+
+    - name: Update kubeconfig
+      run: |
+        aws eks update-kubeconfig \
+          --name $EKS_CLUSTER_NAME \
+          --region $AWS_REGION
+
+    - name: Verify EKS Access
+      run: |
+        kubectl get nodes
+
+    - name: Deploy Frontend
+      run: |
+        kubectl apply -f k8s/dev/frontend/
+
+    - name: Restart Deployment
+      run: |
+        kubectl rollout restart deployment/expense-frontend -n dev
+
+    - name: Verify Deployment
+      run: |
+        kubectl get pods -n dev
+        kubectl get svc -n dev
