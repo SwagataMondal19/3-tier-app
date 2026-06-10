@@ -1,3 +1,4 @@
+
 name: Deploy Backend to EKS
 
 on:
@@ -11,7 +12,7 @@ on:
 env:
   AWS_REGION: ap-south-1
   ECR_REPOSITORY: expense-backend
-  EKS_CLUSTER_NAME: 3-tier-eks-cluster
+  EKS_CLUSTER_NAME: 3-tier-eks
 
 jobs:
   deploy:
