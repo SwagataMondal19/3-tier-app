@@ -9,7 +9,7 @@ function App() {
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
 
-  const API = "http://dev-backend.trainwithprajot.click:3000";
+  const API = "http://dev-backend.trainwithprajot.click";
 
   // Fetch expenses
   const fetchExpenses = async () => {
