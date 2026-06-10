@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./App.css";
@@ -8,7 +9,7 @@ function App() {
   const [title, setTitle] = useState("");
   const [amount, setAmount] = useState("");
 
-  const API = "http://43.205.62.70:3000";
+  const API = "http://dev-backend.trainwithprajot.click:3000";
 
   // Fetch expenses
   const fetchExpenses = async () => {
