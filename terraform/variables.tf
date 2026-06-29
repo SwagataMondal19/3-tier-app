@@ -3,7 +3,7 @@ variable "region" {
 }
 
 variable "cluster_name" {
-  default = "3-tier-eks-app"
+  default = "3-tier-eks"
 }
 
 variable "cluster_version" {
