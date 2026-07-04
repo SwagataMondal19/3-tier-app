@@ -67,7 +67,7 @@ function App() {
   return (
     <div className="container">
 
-      <h1>Expenses Tracker</h1>
+      <h1>Expense Tracker</h1>
 
       <div className="expense-form">
 
