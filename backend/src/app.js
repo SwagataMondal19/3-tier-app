@@ -1,3 +1,5 @@
+const db = require("./db");
+
 const express = require("express");
 const cors = require("cors");
 
@@ -6,34 +8,82 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-let expenses = [];
 
-app.get("/expenses", (req, res) => {
-  res.json(expenses);
+app.get("/expenses", async (req, res) => {
+
+  try {
+
+    const [rows] = await db.query(
+      "SELECT * FROM expenses"
+    );
+
+    res.json(rows);
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+      message: "Database Error"
+    });
+
+  }
+
 });
 
-app.post("/expenses", (req, res) => {
 
-  const expense = {
-    id: Date.now(),
-    title: req.body.title,
-    amount: req.body.amount
-  };
+app.post("/expenses", async (req, res) => {
 
-  expenses.push(expense);
+  try {
 
-  res.status(201).json(expense);
-});
+    const { title, amount } = req.body;
 
-app.delete("/expenses/:id", (req, res) => {
+    const [result] = await db.query(
+      "INSERT INTO expenses (title, amount) VALUES (?, ?)",
+      [title, amount]
+    );
 
-  expenses = expenses.filter(
-    expense => expense.id != req.params.id
-  );
+    res.status(201).json({
+      id: result.insertId,
+      title,
+      amount
+    });
 
-  res.json({
-    message: "Expense deleted"
-  });
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+      message: "Database Error"
+    });
+
+  }
+
+});	
+
+app.delete("/expenses/:id", async (req, res) => {
+
+  try {
+
+    await db.query(
+      "DELETE FROM expenses WHERE id = ?",
+      [req.params.id]
+    );
+
+    res.json({
+      message: "Expense deleted"
+    });
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+      message: "Database Error"
+    });
+
+  }
+
 });
 
 app.get("/health", (req, res) => {
