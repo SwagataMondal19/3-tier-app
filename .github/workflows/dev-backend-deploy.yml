@@ -12,7 +12,7 @@ on:
 env:
   AWS_REGION: ap-south-1
   ECR_REPOSITORY: expense-backend
-  EKS_CLUSTER_NAME: 3-tier-eks
+  EKS_CLUSTER_NAME: 3-tier-eks-app
 
 jobs:
   deploy:
