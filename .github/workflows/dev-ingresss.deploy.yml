@@ -8,7 +8,7 @@ on:
       - dev
     paths:
       - 'k8s/dev/ingress.yml'
-      - '.github/workflows/dev-ingress.deploy.yml'
+      - '.github/workflows/dev-ingresss.deploy.yml'
 
 env:
   AWS_REGION: ap-south-1
