@@ -1,11 +1,14 @@
 name: Deploy Ingress to EKS
 
 on:
+  workflow_dispatch:
+
   push:
     branches:
       - dev
     paths:
       - 'k8s/dev/ingress.yml'
+      - '.github/workflows/dev-ingress.deploy.yml'
 
 env:
   AWS_REGION: ap-south-1
