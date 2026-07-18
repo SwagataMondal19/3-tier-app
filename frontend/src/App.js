@@ -67,7 +67,7 @@ function App() {
   return (
     <div className="container">
 
-      <h1>Expensesssss Tracker in dev environmnet</h1>
+      <h1>Expenses Tracker in dev environmnet</h1>
 
       <div className="expense-form">
 
